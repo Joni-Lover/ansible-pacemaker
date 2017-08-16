@@ -42,7 +42,7 @@
            {{ item['provider'] }} {{ item['options']|join(' ') }}
            {% if item['op'] is defined %}
            op {% for op in item['op'] %}
-                {{ op['action]' }}
+                {{ op['action'] }}
                 {{ op['options']|join(' ') }}
               {% endfor %}
            {% endif %}
@@ -62,7 +62,7 @@
            {{ item['provider'] }}
            {% if item['op'] is defined %}
            op {% for op in item['op'] %}
-                {{ op['action]' }}
+                {{ op['action'] }}
                 {{ op['options']|join(' ') }}
               {% endfor %}
            {% endif %}
