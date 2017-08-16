@@ -26,7 +26,7 @@
 
 - name: config | Setting Fact For Corosync Auth Key On Non Masters
   set_fact:
-    _corosync_authkey_: "{{ hostvars[pacemaker_primary_server]['_corosync_authkey_'] }}"
+    _corosync_authkey_: "{{ hostvars[pacemaker_primary_server]['_corosync_authkey_'].content }}"
   no_log: true
   when: (inventory_hostname != pacemaker_primary_server)
 
