@@ -12,6 +12,7 @@
 - name: create corosync auth key
   shell: corosync-keygen -k "{{ corosync_authkey_file }}"
   creates: "{{ corosync_authkey_file }}"
+  when: (inventory_hostname == pacemaker_primary_server)
   
 - name: config | Capturing Corosync Auth Key
   slurp:
