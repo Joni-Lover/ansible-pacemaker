@@ -59,6 +59,7 @@
   notify:
     - restart corosync
     - restart pacemaker
+  when: ansible_os_family == "Debian"
 
 # Flush handlers
 - meta: flush_handlers
