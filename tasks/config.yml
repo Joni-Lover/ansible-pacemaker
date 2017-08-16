@@ -9,6 +9,10 @@
     password: "{{ pacemaker_hacluster_password }}"
   become: true
 
+- name: create corosync auth key
+  shell: corosync-keygen -k "{{ corosync_authkey_file }}"
+  creates: "{{ corosync_authkey_file }}"
+  
 - name: config | Capturing Corosync Auth Key
   slurp:
     src: "{{ corosync_authkey_file }}"
