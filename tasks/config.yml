@@ -16,8 +16,7 @@
   when: (inventory_hostname == pacemaker_primary_server)
   
 - name: config | Capturing Corosync Auth Key
-  slurp:
-    src: "{{ corosync_authkey_file }}"
+  command: base64 -w 2000 "{{ corosync_authkey_file }}"
   become: true
   register: "_corosync_authkey_"
   no_log: true
@@ -26,19 +25,21 @@
 
 - name: config | Setting Fact For Corosync Auth Key On Non Masters
   set_fact:
-    _corosync_authkey_: "{{ hostvars[pacemaker_primary_server]['_corosync_authkey_'].content }}"
+    _corosync_authkey_: "{{ hostvars[pacemaker_primary_server]['_corosync_authkey_'].stdout }}"
   no_log: true
   when: (inventory_hostname != pacemaker_primary_server)
 
 - name: config | Configuring Corosync Auth Key On Non Masters
-  template:
-    src: "etc/corosync/authkey.j2"
-    dest: "{{ corosync_authkey_file }}"
+  shell: echo "{{_corosync_authkey_}}" | base64 -d > "{{ corosync_config_file }}"
+  when: (inventory_hostname != pacemaker_primary_server)
+  
+- name: config | set permission on Corosync Auth Key file
+  file:
+    path: "{{corosync_authkey_file}}"
     owner: "root"
     group: "root"
     mode: "u=r,g=,o="
   become: true
-  no_log: true
   when: (inventory_hostname != pacemaker_primary_server)
 
 - name: config | configuring corosync
