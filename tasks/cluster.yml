@@ -47,7 +47,7 @@
               {% endfor %}
            {% endif %}
            {% if item.meta is defined %}
-             meta {% for opt, value in item.meta.options.iteritems() %}
+             meta {% for opt, value in item.meta.iteritems() %}
                  {{ opt }}={{ value }}
                {% endfor %}
            {% endif %}
@@ -72,7 +72,7 @@
               {% endfor %}
            {% endif %}
            {% if item.meta is defined %}
-             meta {% for opt, value in item.meta.options.iteritems() %}
+             meta {% for opt, value in item.meta.iteritems() %}
                  {{ opt }}={{ value }}
                {% endfor %}
            {% endif %}
