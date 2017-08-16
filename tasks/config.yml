@@ -10,7 +10,7 @@
   become: true
 
 - name: create corosync auth key
-  command: corosync-keygen -k "{{ corosync_authkey_file }}"
+  command: corosync-keygen -l -k "{{ corosync_authkey_file }}"
   args:
     creates: "{{ corosync_authkey_file }}"
   when: (inventory_hostname == pacemaker_primary_server)
