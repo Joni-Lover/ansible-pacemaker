@@ -30,7 +30,7 @@
   when: (inventory_hostname != pacemaker_primary_server)
 
 - name: config | Configuring Corosync Auth Key On Non Masters
-  shell: echo "{{_corosync_authkey_}}" | base64 -d > "{{ corosync_config_file }}"
+  shell: echo "{{_corosync_authkey_}}" | base64 -d > "{{ corosync_authkey_file }}"
   when: (inventory_hostname != pacemaker_primary_server)
   
 - name: config | set permission on Corosync Auth Key file
