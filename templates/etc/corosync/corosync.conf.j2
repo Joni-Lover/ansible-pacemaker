@@ -6,6 +6,18 @@ totem {
 	clear_node_high_bit: yes
 	crypto_cipher: none
 	crypto_hash: none
+        # Turn off the virtual synchrony filter
+        vsftype: none
+        # Enable encryption (2)
+        secauth: on
+
+        # How many threads to use for encryption/decryption
+        threads: 0
+
+        # This specifies the redundant ring protocol, which may be
+        # none, active, or passive. (3)
+        rrp_mode: active
+	
 	interface {
 		ringnumber: 0
 		bindnetaddr: {{ corosync_bindnet_addr }}
@@ -23,6 +35,21 @@ totem {
 {% endfor %}
 	}
 {% endif %}
+}
+
+amf {
+     mode: disabled
+}
+
+service {
+        # Load the Pacemaker Cluster Resource Manager (5)
+        ver:       1
+        name:      pacemaker
+}
+
+aisexec {
+        user:   root
+        group:  root
 }
 
 logging {
