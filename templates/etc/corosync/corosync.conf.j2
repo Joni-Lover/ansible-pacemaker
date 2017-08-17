@@ -24,17 +24,6 @@ totem {
 		mcastport: {{ corosync_mcastport }}
 		ttl: 1
 	}
-{% if corosync_unicast_mode %}
-	nodelist{
-{% for host in groups[pacemaker_cluster_group] %}
-		node {
-			ring0_addr: {{ hostvars[host]['corosync_bindnet_addr'] }}
-			name: {{ host }}
-			nodeid: {{ loop.index + 1 }}
-		}
-{% endfor %}
-	}
-{% endif %}
 }
 
 amf {
@@ -76,3 +65,15 @@ quorum {
 	last_man_standing: 1
 {% endif %}
 }
+
+{% if corosync_unicast_mode %}
+nodelist{
+{% for host in groups[pacemaker_cluster_group] %}
+	node {
+		ring0_addr: {{ hostvars[host]['corosync_bindnet_addr'] }}
+		name: {{ host }}
+		nodeid: {{ loop.index + 1 }}
+	}
+{% endfor %}
+}
+{% endif %}
