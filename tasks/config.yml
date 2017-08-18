@@ -97,15 +97,20 @@
 - meta: flush_handlers
   become: true
 
-- name: Start all
-  run_once: true
-  command: pcs cluster start --all
-  
-- name: enable all
-  run_once: true
-  command: pcs cluster enable --all
+#- name: Start all
+#  run_once: true
+#  command: pcs cluster start --all
+#  
+#- name: enable all
+#  run_once: true
+#  command: pcs cluster enable --all
 
-
+- name: config | Start all cluster nodes
+  service: name={{ item }} enabled=yes state=started
+  with_items:
+    - corosync
+    - pacemaker
+    
 #- name: config | Ensuring Service Are Enabled
 #  service:
 #    name: "{{ item }}"
