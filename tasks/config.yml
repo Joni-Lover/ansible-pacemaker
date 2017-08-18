@@ -9,52 +9,77 @@
     password: "{{ pacemaker_hacluster_password }}"
   become: true
 
-- name: create corosync auth key
-  command: corosync-keygen -l -k "{{ corosync_authkey_file }}"
+- name: config | Enable and start PCS daemon
+  service: name=pcsd enabled=yes state=started
+
+#- name: create corosync auth key
+#  command: corosync-keygen -l -k "{{ corosync_authkey_file }}"
+#  args:
+#    creates: "{{ corosync_authkey_file }}"
+#  when: (inventory_hostname == pacemaker_primary_server)
+#  
+#- name: config | Capturing Corosync Auth Key
+#  command: base64 -w 2000 "{{ corosync_authkey_file }}"
+#  become: true
+#  register: "_corosync_authkey_"
+#  no_log: true
+#  changed_when: false
+#  when: (inventory_hostname == pacemaker_primary_server)
+#
+#- name: config | Setting Fact For Corosync Auth Key On Non Masters
+#  set_fact:
+#    _corosync_authkey_: "{{ hostvars[pacemaker_primary_server]['_corosync_authkey_'].stdout }}"
+#  no_log: true
+#  when: (inventory_hostname != pacemaker_primary_server)
+#
+#- name: config | Configuring Corosync Auth Key On Non Masters
+#  shell: echo "{{_corosync_authkey_}}" | base64 -d > "{{ corosync_authkey_file }}"
+#  when: (inventory_hostname != pacemaker_primary_server)
+#  
+#- name: config | set permission on Corosync Auth Key file
+#  file:
+#    path: "{{corosync_authkey_file}}"
+#    owner: "root"
+#    group: "root"
+#    mode: "u=r,g=,o="
+#  become: true
+#  when: (inventory_hostname != pacemaker_primary_server)
+#
+#- name: config | configuring corosync
+#  template:
+#    src: "etc/corosync/corosync.conf.j2"
+#    dest: "{{ corosync_config_file }}"
+#    owner: "root"
+#    group: "root"
+#    mode: "u=rw,g=r,o=r"
+#  become: true
+#  notify:
+#    - restart corosync
+#    - restart pacemaker
+#  register: "_corosync_reconfigured"
+  
+  
+- name: Authenticate all nodes
+  command: >
+    pcs cluster auth
+    {% for host in groups[pacemaker_cluster_group] %}
+    {{ hostvars[host]['ansible_hostname'] }}
+    {% endfor %}
+    -u hacluster -p {{ pacemaker_hacluster_password }} --force
+  run_once: true
   args:
-    creates: "{{ corosync_authkey_file }}"
-  when: (inventory_hostname == pacemaker_primary_server)
-  
-- name: config | Capturing Corosync Auth Key
-  command: base64 -w 2000 "{{ corosync_authkey_file }}"
-  become: true
-  register: "_corosync_authkey_"
-  no_log: true
-  changed_when: false
-  when: (inventory_hostname == pacemaker_primary_server)
+    creates: /var/lib/pcsd/tokens
 
-- name: config | Setting Fact For Corosync Auth Key On Non Masters
-  set_fact:
-    _corosync_authkey_: "{{ hostvars[pacemaker_primary_server]['_corosync_authkey_'].stdout }}"
-  no_log: true
-  when: (inventory_hostname != pacemaker_primary_server)
-
-- name: config | Configuring Corosync Auth Key On Non Masters
-  shell: echo "{{_corosync_authkey_}}" | base64 -d > "{{ corosync_authkey_file }}"
-  when: (inventory_hostname != pacemaker_primary_server)
-  
-- name: config | set permission on Corosync Auth Key file
-  file:
-    path: "{{corosync_authkey_file}}"
-    owner: "root"
-    group: "root"
-    mode: "u=r,g=,o="
-  become: true
-  when: (inventory_hostname != pacemaker_primary_server)
-
-- name: config | configuring corosync
-  template:
-    src: "etc/corosync/corosync.conf.j2"
-    dest: "{{ corosync_config_file }}"
-    owner: "root"
-    group: "root"
-    mode: "u=rw,g=r,o=r"
-  become: true
-  notify:
-    - restart corosync
-    - restart pacemaker
-  register: "_corosync_reconfigured"
-
+- name: Setup cluster message bus
+  run_once: true
+  command: >
+    pcs cluster setup --name {{ corosync_cluster_name }}
+    {% for host in groups[pacemaker_cluster_group] %}
+    {{ hostvars[host]['ansible_hostname'] }}
+    {% endfor %} --force
+  args:
+    creates: /etc/corosync/corosync.conf
+    
 - name: config | configuring corosync service to start
   template:
     src: "etc/default/corosync.j2"
@@ -67,23 +92,25 @@
     - restart corosync
     - restart pacemaker
   when: ansible_os_family == "Debian"
-
+  
 # Flush handlers
 - meta: flush_handlers
   become: true
 
-- name: config | Ensuring Service Are Enabled
-  service:
-    name: "{{ item }}"
-    enabled: true
-  become: true
-  with_items:
-    - 'corosync'
-    - 'pacemaker'
-    - 'pcsd'
+- name: Start all
+  run_once: true
+  command: pcs cluster start --all
+  
+- name: enable all
+  run_once: true
+  command: pcs cluster enable --all
 
-- name: config | Ensuring PCSD Service Is Started
-  service:
-    name: 'pcsd'
-    state: "started"
-  become: true
+
+#- name: config | Ensuring Service Are Enabled
+#  service:
+#    name: "{{ item }}"
+#    enabled: true
+#  become: true
+#  with_items:
+#    - 'corosync'
+#    - 'pacemaker'
