@@ -92,7 +92,7 @@ pacemaker_cluster_settings: []
 #
 # Generate new password
 # echo "haclusteradmin" | sha512sum
-pacemaker_hacluster_password: 'f8d1feb7105dfbd2859a17512c7414f89b70dfef815b177444b897edec19a18724f8e9686f0e2daa41c48eb9b0511bae9e659a756f17c39fedb6d68b9230a53c'
+pacemaker_hacluster_password: "haclusteradmin"
 
 # Defines if host is considered to be primary
 # this should be set in host_vars/hostname as true for only one host

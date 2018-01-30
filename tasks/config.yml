@@ -6,7 +6,8 @@
 - name: config | Setting hacluster password
   user:
     name: "hacluster"
-    password: "{{ pacemaker_hacluster_password }}"
+    password: "{{ pacemaker_hacluster_password | password_hash('sha512', ansible_hostname) }}"
+    uid: 1200
   become: true
 
 - name: config | Enable and start PCS daemon
