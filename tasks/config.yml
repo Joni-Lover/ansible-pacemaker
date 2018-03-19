@@ -6,7 +6,7 @@
 - name: config | Setting hacluster password
   user:
     name: "hacluster"
-    password: "{{ pacemaker_hacluster_password | password_hash('sha512', ansible_hostname) }}"
+    password: "{{ pacemaker_hacluster_password | password_hash('sha512', ansible_hostname | regex_replace('[^a-z0-9]', '')) }}"
     uid: 1200
   become: true
 
