@@ -28,6 +28,9 @@ corosync_mcastaddr: 239.255.42.1
 # Define port number to configure as cluster port.
 corosync_mcastport: 5405
 
+# Setting two_node to true enables two node cluster operations
+corosync_two_node: false
+
 # Defines if unicast mode should be used rather than multicast
 corosync_unicast_mode: false
 

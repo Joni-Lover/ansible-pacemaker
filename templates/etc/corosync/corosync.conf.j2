@@ -42,6 +42,9 @@ logging {
 quorum {
 	provider: corosync_votequorum
 	expected_votes: {{ corosync_expected_votes }}
+{% if corosync_two_node is defined and corosync_two_node %}
+	two_node: 1
+{% endif %}
 {% if corosync_wait_for_all is defined and corosync_wait_for_all %}
 	wait_for_all: 1
 {% endif %}
