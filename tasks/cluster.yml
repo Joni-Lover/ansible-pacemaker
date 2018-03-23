@@ -67,6 +67,21 @@
         (item['resource_id'] not in _pcs_resource_show['stdout'] and
         item['action']|lower == 'create')
 
+- name: cluster | Creating Cluster Resources master/slave
+  command: >
+           pcs resource master {{ item['master_slave_id'] }}
+           {{ item['resource_id'] }}
+           {{ item['options']|join(' ') }}
+  become: true
+  with_items: '{{ pacemaker_cluster_resources }}'
+  when: >
+        (pacemaker_cluster_resources is defined and
+        inventory_hostname == pacemaker_primary_server) and
+        (item['options'] is defined and
+        (item['master_slave_id'] is defined and item['master_slave_id'] not in _pcs_resource_show['stdout'] and
+        item['options']|join(' ') not in _pcs_resource_show['stdout'])) and
+        item['action']|lower == 'master'
+
 - name: cluster | Adding Cluster colocation Constraints
   command: >
            pcs constraint colocation add
