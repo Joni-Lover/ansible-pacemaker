@@ -92,6 +92,7 @@
            {{ item['target_resource_id'] }}
            {% endif %}
            {{ item['score']|default('INFINITY') }}
+           {% if item['op_options'] is defined %}{{ item['op_options']|join(' ') }}{% endif %}
   become: true
   with_items: '{{ pacemaker_cluster_constraints }}'
   when: >
