@@ -123,4 +123,4 @@
         ((item['constraint']|lower == 'order') and
         item['order'] is defined) and
         ((item['second_resource_action'] is defined and item['order']['first_resource_action']+" "+item['order']['first_resource']+" then "+item['order']['second_resource_action']+" "+item['order']['second_resource'] not in _pcs_constraint_show['stdout']) or
-        (item['second_resource_action'] is not defined and item['order']['first_resource_action']+" "+item['order']['first_resource'] and item['order']['second_resource'] not in _pcs_constraint_show['stdout']))
+        (item['second_resource_action'] is not defined and item['order']['first_resource_action']+" "+item['order']['first_resource']+" then start "+item['order']['second_resource'] not in _pcs_constraint_show['stdout']))
