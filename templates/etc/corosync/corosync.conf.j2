@@ -6,23 +6,39 @@ totem {
 	clear_node_high_bit: yes
 	crypto_cipher: none
 	crypto_hash: none
+        # Turn off the virtual synchrony filter
+        vsftype: none
+        # Enable encryption (2)
+        secauth: on
+
+        # How many threads to use for encryption/decryption
+        threads: 0
+
+        # This specifies the redundant ring protocol, which may be
+        # none, active, or passive. (3)
+        rrp_mode: active
+	
 	interface {
 		ringnumber: 0
 		bindnetaddr: {{ corosync_bindnet_addr }}
 		mcastport: {{ corosync_mcastport }}
 		ttl: 1
 	}
-{% if corosync_unicast_mode %}
-	nodelist{
-{% for host in groups[pacemaker_cluster_group] %}
-		node {
-			ring0_addr: {{ hostvars[host]['corosync_bindnet_addr'] }}
-			name: {{ host }}
-			nodeid: {{ loop.index + 1 }}
-		}
-{% endfor %}
-	}
-{% endif %}
+}
+
+amf {
+     mode: disabled
+}
+
+service {
+        # Load the Pacemaker Cluster Resource Manager (5)
+        ver:       1
+        name:      pacemaker
+}
+
+aisexec {
+        user:   root
+        group:  root
 }
 
 logging {
@@ -52,3 +68,15 @@ quorum {
 	last_man_standing: 1
 {% endif %}
 }
+
+{% if corosync_unicast_mode %}
+nodelist{
+{% for host in groups[pacemaker_cluster_group] %}
+	node {
+		ring0_addr: {{ hostvars[host]['corosync_bindnet_addr'] }}
+		name: {{ host }}
+		nodeid: {{ loop.index + 1 }}
+	}
+{% endfor %}
+}
+{% endif %}

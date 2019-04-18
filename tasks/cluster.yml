@@ -40,8 +40,17 @@
   command: >
            pcs resource create {{ item['resource_id'] }}
            {{ item['provider'] }} {{ item['options']|join(' ') }}
-           {% if item['op'] is defined %}op {{ item['op'] }}{% endif %}
-           {% if item['op_options'] is defined %}{{ item['op_options']|join(' ') }}{% endif %}
+           {% if item['op'] is defined %}
+           op {% for op in item['op'] %}
+                {{ op['action'] }}
+                {{ op['options']|join(' ') }}
+              {% endfor %}
+           {% endif %}
+           {% if item.meta is defined %}
+             meta {% for opt, value in item.meta.iteritems() %}
+                 {{ opt }}={{ value }}
+               {% endfor %}
+           {% endif %}
   become: true
   with_items: '{{ pacemaker_cluster_resources }}'
   when: >
@@ -56,8 +65,17 @@
   command: >
            pcs resource create {{ item['resource_id'] }}
            {{ item['provider'] }}
-           {% if item['op'] is defined %}op {{ item['op'] }}{% endif %}
-           {% if item['op_options'] is defined %}{{ item['op_options']|join(' ') }}{% endif %}
+           {% if item['op'] is defined %}
+           op {% for op in item['op'] %}
+                {{ op['action'] }}
+                {{ op['options']|join(' ') }}
+              {% endfor %}
+           {% endif %}
+           {% if item.meta is defined %}
+             meta {% for opt, value in item.meta.iteritems() %}
+                 {{ opt }}={{ value }}
+               {% endfor %}
+           {% endif %}
   become: true
   with_items: '{{ pacemaker_cluster_resources }}'
   when: >
