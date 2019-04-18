@@ -67,6 +67,21 @@
         (item['resource_id'] not in _pcs_resource_show['stdout'] and
         item['action']|lower == 'create')
 
+- name: cluster | Creating Cluster Resources master/slave
+  command: >
+           pcs resource master {{ item['master_slave_id'] }}
+           {{ item['resource_id'] }}
+           {{ item['options']|join(' ') }}
+  become: true
+  with_items: '{{ pacemaker_cluster_resources }}'
+  when: >
+        (pacemaker_cluster_resources is defined and
+        inventory_hostname == pacemaker_primary_server) and
+        (item['options'] is defined and
+        (item['master_slave_id'] is defined and item['master_slave_id'] not in _pcs_resource_show['stdout'] and
+        item['options']|join(' ') not in _pcs_resource_show['stdout'])) and
+        item['action']|lower == 'master'
+
 - name: cluster | Adding Cluster colocation Constraints
   command: >
            pcs constraint colocation add
@@ -77,6 +92,7 @@
            {{ item['target_resource_id'] }}
            {% endif %}
            {{ item['score']|default('INFINITY') }}
+           {% if item['op_options'] is defined %}{{ item['op_options']|join(' ') }}{% endif %}
   become: true
   with_items: '{{ pacemaker_cluster_constraints }}'
   when: >
@@ -107,4 +123,4 @@
         ((item['constraint']|lower == 'order') and
         item['order'] is defined) and
         ((item['second_resource_action'] is defined and item['order']['first_resource_action']+" "+item['order']['first_resource']+" then "+item['order']['second_resource_action']+" "+item['order']['second_resource'] not in _pcs_constraint_show['stdout']) or
-        (item['second_resource_action'] is not defined and item['order']['first_resource_action']+" "+item['order']['first_resource'] and item['order']['second_resource'] not in _pcs_constraint_show['stdout']))
+        (item['second_resource_action'] is not defined and item['order']['first_resource_action']+" "+item['order']['first_resource']+" then start "+item['order']['second_resource'] not in _pcs_constraint_show['stdout']))
