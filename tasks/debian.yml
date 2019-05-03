@@ -1,17 +1,9 @@
 ---
 - name: debian | Installing Packages
   apt:
-    name: "{{ item }}"
+    name: ['cluster-glue', 'corosync', 'crmsh', 'fence-agents', 'pacemaker', 'pcs', 'resource-agents']
     state: "present"
   become: true
-  with_items:
-    - 'cluster-glue'
-    - 'corosync'
-    - 'crmsh'
-    - 'fence-agents'
-    - 'pacemaker'
-    - 'pcs'
-    - 'resource-agents'
 
 - name: debian | Checking If {{ corosync_authkey_file }} Exists
   stat:

@@ -30,7 +30,7 @@
   command: >
            pcs property set {{ item['property'] }}={{ item['value'] }}
   become: true
-  with_items: '{{ pacemaker_cluster_settings }}'
+  with_items: "{{ pacemaker_cluster_settings }}"
   when: >
         pacemaker_cluster_settings is defined and
         (inventory_hostname == pacemaker_primary_server) and
@@ -39,7 +39,7 @@
 - name: cluster | Creating Cluster Resources
   command: >
            pcs resource create {{ item['resource_id'] }}
-           {{ item['provider'] }} {{ item['options']|join(' ') }}
+           {{ item['provider'] }} {{ item['options'] | join(' ') }}
            {% if item['op'] is defined %}
            op {% for op in item['op'] %}
                 {{ op['action'] }}
@@ -52,7 +52,7 @@
                {% endfor %}
            {% endif %}
   become: true
-  with_items: '{{ pacemaker_cluster_resources }}'
+  with_items: "{{ pacemaker_cluster_resources }}"
   when: >
         (pacemaker_cluster_resources is defined and
         inventory_hostname == pacemaker_primary_server) and

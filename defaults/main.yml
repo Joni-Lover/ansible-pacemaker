@@ -100,3 +100,6 @@ pacemaker_hacluster_password: "haclusteradmin"
 # Defines if host is considered to be primary
 # this should be set in host_vars/hostname as true for only one host
 pacemaker_primary_server: '{{ groups[pacemaker_cluster_group][0] }}'
+
+# Define folder for store state files
+pacemaker_states_folder: "/opt/pacemaker"
